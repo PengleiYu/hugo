@@ -3,13 +3,13 @@ import org.aspectj.bridge.MessageHandler
 import org.aspectj.tools.ajc.Main
 
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 
 dependencies {
-  compile 'org.aspectj:aspectjrt:1.8.6'
-  compile project(':hugo-annotations')
+  implementation 'org.aspectj:aspectjrt:1.8.6'
+  implementation project(':hugo-annotations')
 
-  testCompile 'junit:junit:4.12'
+  testImplementation 'junit:junit:4.12'
 }
 
 android {
@@ -55,5 +55,41 @@ android.libraryVariants.all { variant ->
           break;
       }
     }
+  }
+}
+afterEvaluate {
+  publishing {
+    publications {
+      mavenJava(MavenPublication) {
+        pom {
+          scm {
+            url = POM_SCM_URL
+            connection = POM_SCM_CONNECTION
+            developerConnection = POM_SCM_DEV_CONNECTION
+          }
+          licenses {
+            license {
+              name = POM_LICENCE_NAME
+              url = POM_LICENCE_URL
+              distribution = POM_LICENCE_DIST
+              comments = 'OSS license'
+            }
+          }
+          developers {
+            developer {
+              id = POM_DEVELOPER_ID
+              name = POM_DEVELOPER_NAME
+            }
+          }
+        }
+        from components.release
+      }
+    }
+    repositories {
+      maven {
+        url = uri("${rootProject.buildDir}/publishing-repository")
+      }
+    }
+
   }
 }
